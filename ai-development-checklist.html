@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Development Checklist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { color: #2c3e50; margin-bottom: 10px; }
+        .progress-bar { background: #ecf0f1; height: 20px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #3498db, #2ecc71); height: 100%; width: 0%; transition: width 0.3s ease; }
+        .progress-text { margin-top: 10px; font-weight: 600; }
+        .section { background: white; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .section-header { background: #34495e; color: white; padding: 15px 20px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .section-header:hover { background: #2c3e50; }
+        .section-content { padding: 0; max-height: 1000px; transition: max-height 0.3s ease; }
+        .section.collapsed .section-content { max-height: 0; overflow: hidden; }
+        .toggle-icon { transition: transform 0.3s ease; }
+        .section.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .checklist-item { padding: 20px; border-bottom: 1px solid #ecf0f1; display: flex; align-items: flex-start; gap: 15px; }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item.completed { background: #f8f9fa; }
+        .checkbox { width: 20px; height: 20px; border: 2px solid #bdc3c7; border-radius: 4px; cursor: pointer; flex-shrink: 0; margin-top: 2px; position: relative; transition: all 0.2s ease; }
+        .checkbox.checked { background: #27ae60; border-color: #27ae60; }
+        .checkbox.checked::after { content: '✓'; position: absolute; top: -2px; left: 2px; color: white; font-weight: bold; font-size: 14px; }
+        .item-content h3 { color: #2c3e50; margin-bottom: 8px; font-size: 16px; }
+        .item-description { color: #7f8c8d; margin-bottom: 8px; }
+        .item-critical { color: #e74c3c; font-weight: 500; margin-bottom: 5px; }
+        .item-section { background: #3498db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .summary { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .summary-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .summary-number { font-size: 24px; font-weight: bold; color: #3498db; }
+        .export-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px 5px; }
+        .export-btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Development Checklist</h1>
+            <p>Essential security, safety, and operational requirements for production AI systems</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 of 20 items completed (0%)</div>
+            <button class="export-btn" onclick="exportProgress()">📊 Export Progress</button>
+            <button class="export-btn" onclick="resetAll()">🔄 Reset All</button>
+        </div>
+
+        <div class="section" data-section="security">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🔒 Security (3 items)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="1">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Authentication (JWT/OAuth)</h3>
+                        <div class="item-description">Implement secure user authentication using standards like JWT (JSON Web Token) or OAuth.</div>
+                        <div class="item-critical">Why Critical: Without authentication, anyone can access your API, leading to abuse, data leaks, and security breaches.</div>
+                        <span class="item-section">Security</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="2">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Rate Limiting per User</h3>
+                        <div class="item-description">Restrict the number of requests a user can make in a given time frame.</div>
+                        <div class="item-critical">Why Critical: Prevents API abuse, cost spikes, and denial-of-service attacks.</div>
+                        <span class="item-section">Security</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="13">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>TLS Encryption (Data in Transit)</h3>
+                        <div class="item-description">Encrypt all data exchanged between client and server using TLS - Transport Layer Security.</div>
+                        <div class="item-critical">Why Critical: Basic security requirement to prevent data interception.</div>
+                        <span class="item-section">Security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="safety">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🛡️ Safety (3 items)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="4">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Output Toxicity Filtering</h3>
+                        <div class="item-description">Use filters or classifiers to detect and block harmful, offensive, or unsafe outputs.</div>
+                        <div class="item-critical">Why Critical: Protects users and prevents reputational damage.</div>
+                        <span class="item-section">Safety</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="10">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Human Escalation Path Defined</h3>
+                        <div class="item-description">Define when and how humans intervene if AI fails or behaves unpredictably.</div>
+                        <div class="item-critical">Why Critical: Safety net for critical failures or ethical issues.</div>
+                        <span class="item-section">Safety</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="17">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Clear Scope Boundaries</h3>
+                        <div class="item-description">Define what your AI can and cannot do.</div>
+                        <div class="item-critical">Why Critical: Prevents misuse and sets user expectations.</div>
+                        <span class="item-section">Safety</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="redteaming">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🎯 Red Teaming (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="3">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Prompt Injection Detection</h3>
+                        <div class="item-description">Detect and block malicious prompts that try to override system instructions or extract sensitive data.</div>
+                        <div class="item-critical">Why Critical: OWASP LLM01 identifies prompt injection as the top vulnerability for LLMs.</div>
+                        <span class="item-section">Red Teaming</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="privacy">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🔐 Privacy (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="5">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>PII Detection and Masking</h3>
+                        <div class="item-description">Identify and mask Personally Identifiable Information in inputs/outputs.</div>
+                        <div class="item-critical">Why Critical: Required by laws like GDPR and HIPAA to protect user privacy.</div>
+                        <span class="item-section">Privacy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="architecture">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🏗️ Architecture (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="6">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Error Handling with Fallbacks</h3>
+                        <div class="item-description">Implement graceful degradation when errors occur (e.g., fallback to a simpler model or cached response).</div>
+                        <div class="item-critical">Why Critical: Prevents crashes and ensures continuity of service.</div>
+                        <span class="item-section">Architecture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="monitoring">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>📊 Monitoring (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="7">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Basic Monitoring (Latency, Errors)</h3>
+                        <div class="item-description">Track system performance metrics like response time and error rates.</div>
+                        <div class="item-critical">Why Critical: You can't fix what you can't measure - monitoring is essential for reliability.</div>
+                        <span class="item-section">Monitoring</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="finops">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>💰 FinOps (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="8">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Cost Alerts and Hard Limits</h3>
+                        <div class="item-description">Set alerts and enforce spending caps for API usage and compute resources.</div>
+                        <div class="item-critical">Why Critical: Prevents unexpected bills (e.g., $100K due to runaway usage).</div>
+                        <span class="item-section">FinOps</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="operations">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>⚙️ Operations (2 items)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="9">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Rollback Procedure Documented</h3>
+                        <div class="item-description">Have a clear plan to revert to a previous version if deployment fails.</div>
+                        <div class="item-critical">Why Critical: Enables quick recovery from bad releases.</div>
+                        <span class="item-section">Operations</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="20">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Kill Switch / Disable Capability</h3>
+                        <div class="item-description">Ability to immediately shut down the AI system in emergencies.</div>
+                        <div class="item-critical">Why Critical: Prevents catastrophic failures or misuse.</div>
+                        <span class="item-section">Operations</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="evaluation">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>📈 Evaluation (2 items)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="11">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Golden Test Dataset (~50 Prompts)</h3>
+                        <div class="item-description">Maintain a fixed set of test prompts to validate model performance before deployment.</div>
+                        <div class="item-critical">Why Critical: Detect regressions early and ensure consistent quality.</div>
+                        <span class="item-section">Evaluation</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="16">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Hallucination Rate Tracking</h3>
+                        <div class="item-description">Measure how often the AI generates incorrect or fabricated information.</div>
+                        <div class="item-critical">Why Critical: Essential for improving reliability and transparency.</div>
+                        <span class="item-section">Evaluation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="mlops">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🔄 MLOps (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="12">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Model/Prompt Version Control</h3>
+                        <div class="item-description">Track versions of models and prompts used in production.</div>
+                        <div class="item-critical">Why Critical: Enables rollback and auditability.</div>
+                        <span class="item-section">MLOps</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="dr">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🚨 Disaster Recovery (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="14">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Backup Strategy (3-2-1 Rule)</h3>
+                        <div class="item-description">Keep 3 copies of data, on 2 different media, with 1 offsite backup.</div>
+                        <div class="item-critical">Why Critical: Ensures disaster recovery capability.</div>
+                        <span class="item-section">DR (Disaster Recovery)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="team">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>👥 Team (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="15">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>API Documentation</h3>
+                        <div class="item-description">Provide clear documentation for your API endpoints and usage.</div>
+                        <div class="item-critical">Why Critical: Helps other developers integrate and maintain the system.</div>
+                        <span class="item-section">Team</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="compliance">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>📋 Compliance (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="18">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Audit Logging</h3>
+                        <div class="item-description">Log all critical actions and decisions for traceability.</div>
+                        <div class="item-critical">Why Critical: Needed for compliance and forensic analysis after incidents.</div>
+                        <span class="item-section">Compliance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" data-section="ethics">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>⚖️ Ethics (1 item)</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="checklist-item" data-id="19">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>Bias Testing Completed</h3>
+                        <div class="item-description">Test for bias in outputs across demographics and contexts.</div>
+                        <div class="item-critical">Why Critical: Avoid discrimination and legal issues.</div>
+                        <span class="item-section">Ethics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h2>📊 Progress Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-number" id="completedCount">0</div>
+                    <div>Completed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="remainingCount">20</div>
+                    <div>Remaining</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="completionRate">0%</div>
+                    <div>Complete</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="criticalRemaining">20</div>
+                    <div>Critical Items Left</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedItems = new Set();
+        const totalItems = 20;
+
+        function toggleItem(checkbox) {
+            const item = checkbox.closest('.checklist-item');
+            const itemId = item.dataset.id;
+            
+            if (completedItems.has(itemId)) {
+                completedItems.delete(itemId);
+                checkbox.classList.remove('checked');
+                item.classList.remove('completed');
+            } else {
+                completedItems.add(itemId);
+                checkbox.classList.add('checked');
+                item.classList.add('completed');
+            }
+            
+            updateProgress();
+            saveProgress();
+        }
+
+        function updateProgress() {
+            const completed = completedItems.size;
+            const remaining = totalItems - completed;
+            const percentage = Math.round((completed / totalItems) * 100);
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${completed} of ${totalItems} items completed (${percentage}%)`;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('remainingCount').textContent = remaining;
+            document.getElementById('completionRate').textContent = percentage + '%';
+            document.getElementById('criticalRemaining').textContent = remaining;
+        }
+
+        function toggleSection(header) {
+            const section = header.closest('.section');
+            section.classList.toggle('collapsed');
+        }
+
+        function saveProgress() {
+            localStorage.setItem('aiChecklistProgress', JSON.stringify([...completedItems]));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('aiChecklistProgress');
+            if (saved) {
+                completedItems = new Set(JSON.parse(saved));
+                completedItems.forEach(itemId => {
+                    const item = document.querySelector(`[data-id="${itemId}"]`);
+                    if (item) {
+                        const checkbox = item.querySelector('.checkbox');
+                        checkbox.classList.add('checked');
+                        item.classList.add('completed');
+                    }
+                });
+                updateProgress();
+            }
+        }
+
+        function exportProgress() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                completed: completedItems.size,
+                total: totalItems,
+                percentage: Math.round((completedItems.size / totalItems) * 100),
+                completedItems: [...completedItems]
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-checklist-progress-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetAll() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                completedItems.clear();
+                document.querySelectorAll('.checkbox').forEach(cb => cb.classList.remove('checked'));
+                document.querySelectorAll('.checklist-item').forEach(item => item.classList.remove('completed'));
+                updateProgress();
+                saveProgress();
+            }
+        }
+
+        // Initialize
+        loadProgress();
+    </script>
+</body>
+</html>
