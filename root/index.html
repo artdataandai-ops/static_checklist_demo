@@ -30,6 +30,8 @@
         .item-description { color: #7f8c8d; margin-bottom: 8px; }
         .item-critical { color: #e74c3c; font-weight: 500; margin-bottom: 5px; }
         .item-section { background: #3498db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .item-approaches { color: #2c3e50; margin-bottom: 8px; font-size: 14px; background: #ecf0f1; padding: 10px; border-radius: 5px; }
+        .item-approaches strong { color: #27ae60; }
         .summary { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px; }
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
         .summary-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; }
@@ -46,7 +48,7 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text" id="progressText">0 of 20 items completed (0%)</div>
+            <div class="progress-text" id="progressText">0 of 22 items completed (0%)</div>
             <button class="export-btn" onclick="exportProgress()">Export Progress</button>
             <button class="export-btn" onclick="resetAll()">Reset All</button>
         </div>
@@ -63,6 +65,7 @@
                         <h3>Authentication (JWT/OAuth)</h3>
                         <div class="item-description">Implement proper user authentication system using JWT tokens or OAuth to ensure only authorized personnel can access our API endpoints.</div>
                         <div class="item-critical">Why Critical: Without authentication, unauthorized users can access our endpoints, potentially leading to data breaches and financial losses.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Using secure token services for API auth, rotate keys - Auth0, AWS Cognito, Azure AD</div>
                         <span class="item-section">Security</span>
                     </div>
                 </div>
@@ -72,6 +75,7 @@
                         <h3>Rate Limiting per User</h3>
                         <div class="item-description">Configure rate limiting to restrict the number of API calls each user can make per minute or hour to prevent system abuse.</div>
                         <div class="item-critical">Why Critical: Without proper limits, a single user can overwhelm our service or cause unexpected cost escalations.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Redis, AWS API Gateway </div>
                         <span class="item-section">Security</span>
                     </div>
                 </div>
@@ -81,6 +85,7 @@
                         <h3>TLS Encryption (Data in Transit)</h3>
                         <div class="item-description">Implement HTTPS encryption for all data transmission between our application and users to prevent unauthorized access to sensitive information.</div>
                         <div class="item-critical">Why Critical: This is a fundamental security requirement. Without encryption, user data remains vulnerable during transmission.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Enforce HTTPS with valid certificates (Encryption) - AWS Certificate Manager, Nginx, Cloudflare</div>
                         <span class="item-section">Security</span>
                     </div>
                 </div>
@@ -99,6 +104,7 @@
                         <h3>Output Toxicity Filtering</h3>
                         <div class="item-description">Deploy content filters to detect and block toxic, harmful, or inappropriate AI generated content before it reaches end users.</div>
                         <div class="item-critical">Why Critical: Inappropriate AI outputs can severely damage our company reputation and user trust.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Azure OpenAI Content Safety, AWS Bedrock Guardrails, Nemo Guardrails</div>
                         <span class="item-section">Safety</span>
                     </div>
                 </div>
@@ -108,15 +114,19 @@
                         <h3>Human Escalation Path Defined</h3>
                         <div class="item-description">Establish clear escalation procedures defining when and how human intervention is required when AI systems behave unexpectedly.</div>
                         <div class="item-critical">Why Critical: When issues arise, we need trained personnel ready to intervene quickly and effectively.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> ServiceNow, PagerDuty, Slack alerts | Methods: Automated alerts, confidence thresholds</div>
                         <span class="item-section">Safety</span>
                     </div>
                 </div>
                 <div class="checklist-item" data-id="17">
                     <div class="checkbox" onclick="toggleItem(this)"></div>
                     <div class="item-content">
-                        <h3>Clear Scope Boundaries</h3>
+                        <h3>Clear Scope Boundaries
+                            
+                        </h3>
                         <div class="item-description">Define clear boundaries specifying what our AI system is designed to do and what use cases are strictly prohibited.</div>
                         <div class="item-critical">Why Critical: Users may attempt to use our AI beyond its intended scope, creating potential liability and compliance issues.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> OpenAPI specs, input validation | Methods: Prompt engineering, use case classification</div>
                         <span class="item-section">Safety</span>
                     </div>
                 </div>
@@ -135,6 +145,7 @@
                         <h3>Prompt Injection Detection</h3>
                         <div class="item-description">Implement detection mechanisms to identify malicious prompts attempting to override system instructions or extract sensitive information.</div>
                         <div class="item-critical">Why Critical: Prompt injection represents the primary security vulnerability for LLM systems and requires proactive mitigation.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Azure AI Content Safety, Custom regex | Methods: Input sanitization, prompt templates</div>
                         <span class="item-section">Red Teaming</span>
                     </div>
                 </div>
@@ -152,7 +163,8 @@
                     <div class="item-content">
                         <h3>PII Detection and Masking</h3>
                         <div class="item-description">Deploy automated systems to identify and mask personally identifiable information in both user inputs and AI generated outputs.</div>
-                        <div class="item-critical">Why Critical: Privacy regulations like GDPR impose significant financial penalties for personal data breaches. Compliance is mandatory.</div>
+                        <div class="item-critical">Why Critical: Privacy regulations like GDPR impose significant financial penalties for personal data breaches. Compliance is mandatory (GDPR/CCPA).</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Identify and mask personal data in inputs and outputs.  Microsoft Presidio, AWS Comprehend PII, spaCy NER, regex patterns</div>
                         <span class="item-section">Privacy</span>
                     </div>
                 </div>
@@ -171,6 +183,7 @@
                         <h3>Error Handling with Fallbacks</h3>
                         <div class="item-description">Implement graceful error handling with fallback mechanisms such as alternative models or cached responses when primary systems fail.</div>
                         <div class="item-critical">Why Critical: Users expect consistent service availability. System failures directly impact user experience and business continuity.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Fallback to cached responses or alternate APIs on failures - Circuit breakers, Redis cache, Hystrix</div>
                         <span class="item-section">Architecture</span>
                     </div>
                 </div>
@@ -189,6 +202,7 @@
                         <h3>Monitoring (Latency, Errors)</h3>
                         <div class="item-description">Monitor essential system performance metrics including response latency and error rates to maintain service quality.</div>
                         <div class="item-critical">Why Critical: Proactive monitoring enables us to identify and resolve issues before they impact user experience.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> LangSmith, Azure AI Studio, Arize Phoenix</div>
                         <span class="item-section">Monitoring</span>
                     </div>
                 </div>
@@ -207,6 +221,7 @@
                         <h3>Cost Alerts and Hard Limits</h3>
                         <div class="item-description">Configure cost monitoring alerts and enforce hard spending limits to prevent unexpected budget overruns from API usage and compute resources.</div>
                         <div class="item-critical">Why Critical: AI infrastructure costs can escalate rapidly. Organizations have experienced surprise bills exceeding budgets due to uncontrolled usage.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Cloud budgets(AWS/Azure/GCP), Custom Billing Monitors - Budget alarms. auto-shutdown </div>
                         <span class="item-section">FinOps</span>
                     </div>
                 </div>
@@ -225,6 +240,7 @@
                         <h3>Rollback Procedure Documented</h3>
                         <div class="item-description">Document comprehensive rollback procedures with step by step instructions for reverting deployments when issues occur.</div>
                         <div class="item-critical">Why Critical: During production incidents, we need clear procedures to restore service quickly and minimize customer impact.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Azure DevOps, GitHub Actions, Jenkins</div>
                         <span class="item-section">Operations</span>
                     </div>
                 </div>
@@ -234,6 +250,7 @@
                         <h3>Kill Switch / Disable Capability</h3>
                         <div class="item-description">Implement emergency shutdown capabilities to immediately disable AI systems during critical incidents or security breaches.</div>
                         <div class="item-critical">Why Critical: Emergency situations require immediate system shutdown capabilities to prevent further damage or misuse.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> One button shutdown for critical failures.</div>
                         <span class="item-section">Operations</span>
                     </div>
                 </div>
@@ -242,7 +259,7 @@
 
         <div class="section" data-section="evaluation">
             <div class="section-header" onclick="toggleSection(this)">
-                <span>Evaluation (2 items)</span>
+                <span>Evaluation (3 items)</span>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="section-content">
@@ -252,6 +269,7 @@
                         <h3>Golden Test Dataset (~50 Prompts)</h3>
                         <div class="item-description">Maintain a standardized test dataset of approximately 50 prompts for consistent quality validation before each deployment.</div>
                         <div class="item-critical">Why Critical: Consistent testing prevents deployment of degraded models and ensures we detect quality regressions early.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> AI evaluation service in GCP, RAGAS, Arize AI, Langsmith; Regression testing, A/B testing</div>
                         <span class="item-section">Evaluation</span>
                     </div>
                 </div>
@@ -261,6 +279,17 @@
                         <h3>Hallucination Rate Tracking</h3>
                         <div class="item-description">Track and measure the frequency of AI generated incorrect or fabricated information to assess system reliability.</div>
                         <div class="item-critical">Why Critical: Understanding hallucination rates is essential for system improvement and setting appropriate user expectations about accuracy.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Custom evaluation pipelines | Libraries: BLEU, ROUGE, BERTScore</div>
+                        <span class="item-section">Evaluation</span>
+                    </div>
+                </div>
+                <div class="checklist-item" data-id="21">
+                    <div class="checkbox" onclick="toggleItem(this)"></div>
+                    <div class="item-content">
+                        <h3>User Feedback Collection System</h3>
+                        <div class="item-description">Implement mechanisms for users to provide feedback on AI outputs including thumbs up/down ratings, issue reporting, and quality assessments.</div>
+                        <div class="item-critical">Why Critical: User feedback is essential for continuous model improvement, detecting edge cases, and maintaining system quality over time.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> In-app feedback widgetswith custom human-in-the-loop workflows | Tools: Mlflow, Langfuse</div>
                         <span class="item-section">Evaluation</span>
                     </div>
                 </div>
@@ -279,6 +308,7 @@
                         <h3>Model/Prompt Version Control</h3>
                         <div class="item-description">Maintain version control for AI models and prompts deployed in production environments, similar to source code management.</div>
                         <div class="item-critical">Why Critical: When system issues occur, we need to identify exactly what changed to enable quick rollback and root cause analysis.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Azure Machine Learning, MLflow Model Registry, Latitude, Lilypad, Langsmith | Methods: Semantic versioning</div>
                         <span class="item-section">MLOps</span>
                     </div>
                 </div>
@@ -297,6 +327,7 @@
                         <h3>Backup Strategy (3-2-1 Rule)</h3>
                         <div class="item-description">Implement the 3-2-1 backup strategy: maintain 3 copies of critical data across 2 different storage media with 1 copy stored offsite.</div>
                         <div class="item-critical">Why Critical: Hardware failures and disasters are inevitable. Without proper backups, we risk permanent data loss and business continuity issues.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> AWS S3, Azure Blob Storage Methods: Cross-region replication</div>
                         <span class="item-section">DR (Disaster Recovery)</span>
                     </div>
                 </div>
@@ -315,6 +346,7 @@
                         <h3>API Documentation</h3>
                         <div class="item-description">Create comprehensive API documentation including endpoint specifications, parameter requirements, and practical usage examples.</div>
                         <div class="item-critical">Why Critical: Inadequate documentation leads to integration difficulties, increased support requests, and developer frustration.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Swagger/OpenAPI, Postman </div>
                         <span class="item-section">Team</span>
                     </div>
                 </div>
@@ -333,6 +365,7 @@
                         <h3>Audit Logging</h3>
                         <div class="item-description">Implement comprehensive audit logging to record all critical system actions, decisions, and user interactions with timestamps and user identification.</div>
                         <div class="item-critical">Why Critical: Regulatory compliance and incident investigation require detailed audit trails to demonstrate proper governance and accountability.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Log all system actions plus users with timestamps. ELK stack (Elasticsearch/Logstash/Kibana), Splunk</div>
                         <span class="item-section">Compliance</span>
                     </div>
                 </div>
@@ -341,7 +374,7 @@
 
         <div class="section" data-section="ethics">
             <div class="section-header" onclick="toggleSection(this)">
-                <span>Ethics (1 item)</span>
+                <span>Ethics (2 item)</span>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="section-content">
@@ -351,10 +384,22 @@
                         <h3>Bias Testing Completed</h3>
                         <div class="item-description">Conduct comprehensive bias testing across diverse demographic groups and use cases to identify unfair or discriminatory AI outputs.</div>
                         <div class="item-critical">Why Critical: Biased AI systems can result in legal action, regulatory penalties, and significant reputational damage in the marketplace.</div>
+                        <div class="item-approaches"><strong>Implementation:</strong> Azure Machine Learning Fairness, Bias test suites</div>
                         <span class="item-section">Ethics</span>
                     </div>
                 </div>
             </div>
+            <div class="checklist-item" data-id="22">
+                <div class="checkbox" onclick="toggleItem(this)"></div>
+                <div class="item-content">
+                    <h3>Model Explainability/Interpretability</h3>
+                    <div class="item-description">Implement mechanisms to explain AI decision-making processes to stakeholders, including confidence scores, feature importance, or reasoning chains for critical outputs.</div>
+                    <div class="item-critical">Why Critical: Regulatory compliance (EU AI Act), building user trust, debugging model behavior, and meeting enterprise governance requirements for transparent AI systems.</div>
+                    <div class="item-approaches"><strong>Implementation:</strong> SHAP, LIME, Azure Machine Learning Interpretability, AWS SageMaker Clarify | Methods: Attention visualization, confidence scores, reasoning chains</div>
+                    <span class="item-section">Ethics</span>
+                </div>
+            </div>
+
         </div>
 
         <div class="summary">
@@ -365,7 +410,7 @@
                     <div>Completed</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" id="remainingCount">20</div>
+                    <div class="summary-number" id="remainingCount">22</div>
                     <div>Remaining</div>
                 </div>
                 <div class="summary-item">
@@ -373,7 +418,7 @@
                     <div>Complete</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" id="criticalRemaining">20</div>
+                    <div class="summary-number" id="criticalRemaining">22</div>
                     <div>Critical Items Left</div>
                 </div>
             </div>
@@ -382,7 +427,7 @@
 
     <script>
         let completedItems = new Set();
-        const totalItems = 20;
+        const totalItems = 22;
 
         function toggleItem(checkbox) {
             const item = checkbox.closest('.checklist-item');
