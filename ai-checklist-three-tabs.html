@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Development Checklist - Three Tab View</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { color: #2c3e50; margin-bottom: 10px; }
+
+        /* Tab Styles */
+        .tab-container { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden; }
+        .tab-nav { display: flex; background: #34495e; }
+        .tab-btn { flex: 1; padding: 15px 20px; background: none; border: none; color: white; cursor: pointer; font-size: 16px; font-weight: 600; transition: background 0.3s; }
+        .tab-btn:hover { background: rgba(255,255,255,0.1); }
+        .tab-btn.active { background: #2c3e50; }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+
+        /* Deployment Type Indicators */
+        .deployment-info { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .deployment-info.generic { background: #f0f4f8; border-left: 4px solid #8e44ad; }
+        .deployment-info.onpremise { background: #e8f5e8; border-left: 4px solid #27ae60; }
+        .deployment-info.cloud { background: #e8f4fd; border-left: 4px solid #3498db; }
+
+        /* Progress and Controls */
+        .progress-bar { background: #ecf0f1; height: 20px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #3498db, #2ecc71); height: 100%; width: 0%; transition: width 0.3s ease; }
+        .progress-text { margin-top: 10px; font-weight: 600; }
+        .controls { margin-bottom: 20px; }
+        .export-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 0 5px; }
+        .export-btn:hover { background: #2980b9; }
+
+        /* Section Styles */
+        .section { background: white; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .section-header { background: #34495e; color: white; padding: 15px 20px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .section-header:hover { background: #2c3e50; }
+        .section-content { padding: 0; max-height: 2000px; transition: max-height 0.3s ease; }
+        .section.collapsed .section-content { max-height: 0; overflow: hidden; }
+        .toggle-icon { transition: transform 0.3s ease; }
+        .section.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+        /* Checklist Item Styles */
+        .checklist-item { padding: 20px; border-bottom: 1px solid #ecf0f1; display: flex; align-items: flex-start; gap: 15px; }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item.completed { background: #f8f9fa; }
+        .checkbox { width: 20px; height: 20px; border: 2px solid #bdc3c7; border-radius: 4px; cursor: pointer; flex-shrink: 0; margin-top: 2px; position: relative; transition: all 0.2s ease; }
+        .checkbox.checked { background: #27ae60; border-color: #27ae60; }
+        .checkbox.checked::after { content: '✓'; position: absolute; top: -2px; left: 2px; color: white; font-weight: bold; font-size: 14px; }
+        .item-content h3 { color: #2c3e50; margin-bottom: 8px; font-size: 16px; }
+        .item-description { color: #7f8c8d; margin-bottom: 8px; }
+        .item-critical { color: #e74c3c; font-weight: 500; margin-bottom: 5px; }
+        .item-approaches { color: #2c3e50; margin-bottom: 8px; font-size: 14px; background: #ecf0f1; padding: 10px; border-radius: 5px; }
+        .item-approaches strong { color: #27ae60; }
+        .item-section { background: #8e44ad; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .item-section.cloud { background: #3498db; }
+        .item-section.onpremise { background: #27ae60; }
+
+        /* Summary Styles */
+        .summary { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .summary-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .summary-number { font-size: 24px; font-weight: bold; color: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Development Checklist</h1>
+            <p>Comprehensive security & operational requirements organized by deployment type</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('generic')">Generic Development (27 items)</button>
+                <button class="tab-btn" onclick="switchTab('onpremise')">On-Premise (13 items)</button>
+                <button class="tab-btn" onclick="switchTab('cloud')">Cloud - AWS (13 items)</button>
+            </div>
+
+            <!-- Generic Development Tab -->
+            <div id="generic-tab" class="tab-content active">
+                <div class="deployment-info generic">
+                    <strong>Generic Development Checklist:</strong> Core requirements applicable to all AI deployments regardless of infrastructure
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="generic-progress"></div>
+                </div>
+                <div class="progress-text" id="generic-text">0 of 27 items completed (0%)</div>
+
+                <div class="controls">
+                    <button class="export-btn" onclick="exportProgress('generic')">Export Progress</button>
+                    <button class="export-btn" onclick="resetProgress('generic')">Reset All</button>
+                </div>
+
+                <div id="generic-sections">
+                    <!-- Security Section -->
+                    <div class="section" data-section="security">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Security (5 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="1">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Authentication (JWT/OAuth)</h3>
+                                    <div class="item-description">Implement proper user authentication system using JWT tokens or OAuth to ensure only authorized personnel can access our API endpoints.</div>
+                                    <div class="item-critical">Why Critical: Without authentication, unauthorized users can access our endpoints, potentially leading to data breaches and financial losses.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Identity providers, JWT libraries - Keycloak, Auth0, Azure AD, custom JWT implementation, Amazon Cognito, IAM Identity Center</div>
+                                    <span class="item-section">Security</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="1a">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Access Control (RBAC)</h3>
+                                    <div class="item-description">Implement Role-Based Access Control to manage permissions for model access, data access, and system operations with defined approval workflows for elevated privileges.</div>
+                                    <div class="item-critical">Why Critical: Authentication verifies identity, but RBAC controls what users can do. Without proper access control, authenticated users may access data or perform actions beyond their authorization.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> RBAC policies, approval workflows | Tools: Azure RBAC, AWS IAM, Keycloak roles, Open Policy Agent (OPA)</div>
+                                    <span class="item-section">Security</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="1b">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Secrets & Key Management</h3>
+                                    <div class="item-description">Implement secure storage and management of API keys, credentials, encryption keys, and other secrets with automated rotation policies and access auditing.</div>
+                                    <div class="item-critical">Why Critical: Hardcoded or poorly managed secrets are a leading cause of security breaches. Compromised API keys can lead to data theft, unauthorized access, and financial losses.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Secret rotation policies, access auditing | Tools: HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret Manager, HSM</div>
+                                    <span class="item-section">Security</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="2">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Rate Limiting per User</h3>
+                                    <div class="item-description">Configure rate limiting to restrict the number of API calls each user can make per minute or hour to prevent system abuse.</div>
+                                    <div class="item-critical">Why Critical: Without proper limits, a single user can overwhelm our service or cause unexpected cost escalations.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Redis, Nginx rate limiting, HAProxy, API Gateway</div>
+                                    <span class="item-section">Security</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="3">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>TLS Encryption (Data in Transit)</h3>
+                                    <div class="item-description">Implement HTTPS encryption for all data transmission between our application and users to prevent unauthorized access to sensitive information.</div>
+                                    <div class="item-critical">Why Critical: This is a fundamental security requirement. Without encryption, user data remains vulnerable during transmission.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Valid certificates, OpenSSL, Nginx, Apache, Certificate Manager</div>
+                                    <span class="item-section">Security</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Section -->
+                    <div class="section" data-section="safety">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Safety (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="4">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Output Toxicity Filtering</h3>
+                                    <div class="item-description">Deploy content filters to detect and block toxic, harmful, or inappropriate AI generated content before it reaches end users.</div>
+                                    <div class="item-critical">Why Critical: Inappropriate AI outputs can severely damage our company reputation and user trust.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Content filters - Detoxify, Perspective API, custom NLP models, Nemo Guardrails</div>
+                                    <span class="item-section">Safety</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="5">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Human Escalation Path Defined</h3>
+                                    <div class="item-description">Establish clear escalation procedures defining when and how human intervention is required when AI systems behave unexpectedly.</div>
+                                    <div class="item-critical">Why Critical: When issues arise, we need trained personnel ready to intervene quickly and effectively.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Alerting systems - Grafana alerts, Prometheus AlertManager, PagerDuty, custom notification systems</div>
+                                    <span class="item-section">Safety</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="6">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Clear Scope Boundaries</h3>
+                                    <div class="item-description">Define clear boundaries specifying what our AI system is designed to do and what use cases are strictly prohibited.</div>
+                                    <div class="item-critical">Why Critical: Users may attempt to use our AI beyond its intended scope, creating potential liability and compliance issues.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Guardrails, Prompt engineering, use case classification</div>
+                                    <span class="item-section">Safety</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monitoring Section -->
+                    <div class="section" data-section="monitoring">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Monitoring (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="7">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Monitoring (Latency, Errors)</h3>
+                                    <div class="item-description">Monitor essential system performance metrics including response latency and error rates to maintain service quality.</div>
+                                    <div class="item-critical">Why Critical: Proactive monitoring enables us to identify and resolve issues before they impact user experience.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Prometheus + Grafana, ELK stack, Datadog, custom dashboards, MLflow tracking</div>
+                                    <span class="item-section">Monitoring</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Section -->
+                    <div class="section" data-section="privacy">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Privacy (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="8">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>PII Detection and Masking</h3>
+                                    <div class="item-description">Deploy automated systems to identify and mask personally identifiable information in both user inputs and AI generated outputs.</div>
+                                    <div class="item-critical">Why Critical: Privacy regulations like GDPR impose significant financial penalties for personal data breaches. Compliance is mandatory.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> PII detection - spaCy NER, regex patterns, custom NLP models, Presidio, AWS Macie</div>
+                                    <span class="item-section">Privacy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Red Teaming Section -->
+                    <div class="section" data-section="redteaming">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Red Teaming (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="9">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Prompt Injection & Context Poisoning Protection</h3>
+                                    <div class="item-description">Protect against malicious prompts in user inputs, RAG documents, or context that could manipulate model behavior, extract system prompts, or bypass safety guardrails.</div>
+                                    <div class="item-critical">Why Critical: GenAI systems are vulnerable to prompt injection attacks that can cause data leakage, unauthorized actions, or complete system compromise through manipulated context.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Input sanitization, context validation, prompt templates, adversarial prompt detection, RAG document filtering</div>
+                                    <span class="item-section">Red Teaming</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="9b">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Training Data & System Prompt Leakage Prevention</h3>
+                                    <div class="item-description">Prevent GenAI models from exposing training data, system prompts, internal instructions, or proprietary information through crafted queries, jailbreaking, or prompt extraction attacks.</div>
+                                    <div class="item-critical">Why Critical: GenAI models can leak system prompts, training examples, or confidential instructions through adversarial prompting, exposing intellectual property and sensitive data.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Output filtering, prompt extraction detection, system prompt protection, training data memorization testing</div>
+                                    <span class="item-section">Red Teaming</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="9c">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Jailbreaking & Safety Bypass Testing</h3>
+                                    <div class="item-description">Conduct systematic testing to identify ways users might bypass safety guardrails, content filters, or system boundaries through creative prompting techniques.</div>
+                                    <div class="item-critical">Why Critical: Adversarial users will attempt to bypass safety measures. Proactive testing helps identify and patch vulnerabilities before exploitation.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Red team exercises, adversarial prompt libraries, automated jailbreak testing, safety guardrail validation</div>
+                                    <span class="item-section">Red Teaming</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Architecture Section -->
+                    <div class="section" data-section="architecture">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Architecture (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="10">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Error Handling with Fallbacks</h3>
+                                    <div class="item-description">Implement graceful error handling with fallback mechanisms such as alternative models or cached responses when primary systems fail.</div>
+                                    <div class="item-critical">Why Critical: Users expect consistent service availability. System failures directly impact user experience and business continuity.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Fallback to cached responses or alternate APIs on failures - Circuit breakers, Redis cache, Hystrix</div>
+                                    <span class="item-section">Architecture</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FinOps Section -->
+                    <div class="section" data-section="finops">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>FinOps (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="11">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Cost Alerts and Hard Limits</h3>
+                                    <div class="item-description">Configure cost monitoring alerts and enforce hard spending limits to prevent unexpected budget overruns from API usage and compute resources.</div>
+                                    <div class="item-critical">Why Critical: AI infrastructure costs can escalate rapidly. Organizations have experienced surprise bills exceeding budgets due to uncontrolled usage.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Resource monitoring dashboards, cost tracking, Prometheus metrics, cloud billing alerts</div>
+                                    <span class="item-section">FinOps</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Operations Section -->
+                    <div class="section" data-section="operations">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Operations (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="12">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Rollback Procedure Documented</h3>
+                                    <div class="item-description">Document comprehensive rollback procedures with step by step instructions for reverting deployments when issues occur.</div>
+                                    <div class="item-critical">Why Critical: During production incidents, we need clear procedures to restore service quickly and minimize customer impact.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> CI/CD pipelines - Jenkins, GitLab CI, GitHub Actions, custom deployment scripts</div>
+                                    <span class="item-section">Operations</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="13">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Kill Switch / Disable Capability</h3>
+                                    <div class="item-description">Implement emergency shutdown capabilities to immediately disable AI systems during critical incidents or security breaches.</div>
+                                    <div class="item-critical">Why Critical: Emergency situations require immediate system shutdown capabilities to prevent further damage or misuse.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> One button shutdown for critical failures</div>
+                                    <span class="item-section">Operations</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Section -->
+                    <div class="section" data-section="evaluation">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Evaluation (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="14">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Golden Test Dataset (~50 Prompts)</h3>
+                                    <div class="item-description">Maintain a standardized test dataset of approximately 50 prompts for consistent quality validation before each deployment.</div>
+                                    <div class="item-critical">Why Critical: Consistent testing prevents deployment of degraded models and ensures we detect quality regressions early.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Evaluation frameworks - RAGAS, custom test frameworks, MLflow experiments, evaluation pipelines</div>
+                                    <span class="item-section">Evaluation</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="15">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Hallucination Rate Tracking</h3>
+                                    <div class="item-description">Track and measure the frequency of AI generated incorrect or fabricated information to assess system reliability.</div>
+                                    <div class="item-critical">Why Critical: Understanding hallucination rates is essential for system improvement and setting appropriate user expectations about accuracy.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Custom evaluation pipelines | BLEU, ROUGE, BERTScore</div>
+                                    <span class="item-section">Evaluation</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="16">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>User Feedback Collection System</h3>
+                                    <div class="item-description">Implement mechanisms for users to provide feedback on AI outputs including thumbs up/down ratings, issue reporting, and quality assessments.</div>
+                                    <div class="item-critical">Why Critical: User feedback is essential for continuous model improvement, detecting edge cases, and maintaining system quality over time.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> In-app feedback widgets with human-in-the-loop workflows | Tools: Mlflow, Langfuse</div>
+                                    <span class="item-section">Evaluation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MLOps Section -->
+                    <div class="section" data-section="mlops">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>MLOps (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="17">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Model/Prompt Version Control</h3>
+                                    <div class="item-description">Maintain version control for AI models and prompts deployed in production environments, similar to source code management.</div>
+                                    <div class="item-critical">Why Critical: When system issues occur, we need to identify exactly what changed to enable quick rollback and root cause analysis.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> MLflow Model Registry, DVC, Git LFS, custom versioning systems | Methods: Semantic versioning</div>
+                                    <span class="item-section">MLOps</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disaster Recovery Section -->
+                    <div class="section" data-section="dr">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Disaster Recovery (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="18">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Backup Strategy & RTO/RPO Targets</h3>
+                                    <div class="item-description">Implement the 3-2-1 backup strategy with defined backup frequency, offsite copies, and documented RTO (Recovery Time Objective) and RPO (Recovery Point Objective) targets for disaster recovery.</div>
+                                    <div class="item-critical">Why Critical: Hardware failures and disasters are inevitable. Without proper backups and defined recovery targets, organizations cannot guarantee business continuity or meet SLAs during outages.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Backup scheduling, RTO/RPO documentation, recovery testing | Tools: NFS, S3, GCS, RAID, Velero | Methods: Offsite backup, cross-region replication, regular DR drills</div>
+                                    <span class="item-section">DR (Disaster Recovery)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Section -->
+                    <div class="section" data-section="team">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Team (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="19">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>API Documentation</h3>
+                                    <div class="item-description">Create comprehensive API documentation including endpoint specifications, parameter requirements, and practical usage examples.</div>
+                                    <div class="item-critical">Why Critical: Inadequate documentation leads to integration difficulties, increased support requests, and developer frustration.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Swagger/OpenAPI, Postman</div>
+                                    <span class="item-section">Team</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Section -->
+                    <div class="section" data-section="compliance">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Compliance (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="20">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Audit Logging & Log Management</h3>
+                                    <div class="item-description">Implement comprehensive audit logging with central log aggregation, defined retention policies, and log integrity checks. Establish internal audit procedures and evidence collection processes for regulatory compliance.</div>
+                                    <div class="item-critical">Why Critical: Regulatory compliance and incident investigation require detailed audit trails with tamper-proof logs. Regulators expect documented audit procedures and readily available evidence.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Central log aggregation, retention policies, log integrity verification, audit runbooks | Tools: ELK stack, Splunk, CloudWatch, Loki | Methods: Log signing, immutable storage, scheduled audit reviews</div>
+                                    <span class="item-section">Compliance</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="20a">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Data Retention & Deletion Policies</h3>
+                                    <div class="item-description">Establish clear policies for data lifecycle management including retention periods, automated deletion schedules, and secure data disposal procedures for training data, logs, and user interactions.</div>
+                                    <div class="item-critical">Why Critical: GDPR "right to be forgotten", CCPA, PIPEDA, and other privacy regulations require systematic data deletion.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Automated data lifecycle policies, secure deletion procedures</div>
+                                    <span class="item-section">Compliance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ethics Section -->
+                    <div class="section" data-section="ethics">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Ethics (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="generic" data-id="21">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Bias Testing Completed</h3>
+                                    <div class="item-description">Conduct comprehensive bias testing across diverse demographic groups and use cases to identify unfair or discriminatory AI outputs.</div>
+                                    <div class="item-critical">Why Critical: Biased AI systems can result in legal action, regulatory penalties, and significant reputational damage in the marketplace.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Bias testing frameworks - Fairlearn, AIF360, custom bias detection frameworks</div>
+                                    <span class="item-section">Ethics</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="generic" data-id="22">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Model Explainability/Interpretability</h3>
+                                    <div class="item-description">Implement mechanisms to explain AI decision-making processes to stakeholders, including confidence scores, feature importance, or reasoning chains for critical outputs.</div>
+                                    <div class="item-critical">Why Critical: Regulatory compliance (EU AI Act), building user trust, debugging model behavior, and meeting enterprise governance requirements for transparent AI systems.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Explainability tools - SHAP, LIME, ELI5 | Methods: Attention visualization, confidence scores, reasoning chains</div>
+                                    <span class="item-section">Ethics</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <h2>Progress Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-number" id="generic-completed">0</div>
+                            <div>Completed</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="generic-remaining">27</div>
+                            <div>Remaining</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="generic-rate">0%</div>
+                            <div>Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- On-Premise Tab -->
+            <div id="onpremise-tab" class="tab-content">
+                <div class="deployment-info onpremise">
+                    <strong>On-Premise Deployment:</strong> Additional requirements for maximum control and security with dedicated infrastructure
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="onpremise-progress"></div>
+                </div>
+                <div class="progress-text" id="onpremise-text">0 of 11 items completed (0%)</div>
+
+                <div class="controls">
+                    <button class="export-btn" onclick="exportProgress('onpremise')">Export Progress</button>
+                    <button class="export-btn" onclick="resetProgress('onpremise')">Reset All</button>
+                </div>
+
+                <div id="onpremise-sections">
+                    <!-- MLOps On-Premise Specific -->
+                    <div class="section" data-section="mlops-onprem">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>MLOps - On-Premise (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="22a">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Use Case-Specific Model Selection</h3>
+                                    <div class="item-description">Evaluate and select the most appropriate model size and architecture based on your specific use case, performance requirements, and available hardware resources.</div>
+                                    <div class="item-critical">Why Critical: Wrong model choice leads to poor performance, excessive resource consumption, or inability to meet latency requirements in production.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Model benchmarking, performance testing | Tools: Llama 2/3, Mistral, Phi models</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="22b">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Model Hosting & Updates Process</h3>
+                                    <div class="item-description">Establish documented processes for hosting models on local servers including deployment procedures, update scheduling, and version management for self-hosted AI infrastructure.</div>
+                                    <div class="item-critical">Why Critical: Without clear hosting and update processes, model deployments become inconsistent, updates get delayed, and troubleshooting becomes difficult.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Model serving frameworks, update runbooks | Tools: TorchServe, Triton Inference Server, vLLM, Ollama</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Infrastructure & Hardware Section -->
+                    <div class="section" data-section="infrastructure">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Infrastructure & Hardware (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="23">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>GPU Resource Management & Orchestration</h3>
+                                    <div class="item-description">Implement efficient GPU resource allocation, scheduling, and monitoring to maximize utilization across multiple AI workloads and prevent resource conflicts.</div>
+                                    <div class="item-critical">Why Critical: GPUs are expensive resources. Poor management leads to underutilization, bottlenecks, and significant cost inefficiencies in on-premise deployments.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Kubernetes GPU operators, NVIDIA MIG, Slurm | Tools: NVIDIA DCGM</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="24">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Hardware Redundancy & Failover</h3>
+                                    <div class="item-description">Design redundant hardware architecture with automatic failover capabilities to ensure continuous AI service availability during hardware failures.</div>
+                                    <div class="item-critical">Why Critical: Hardware failures are inevitable in on-premise environments. Without redundancy, single points of failure can cause complete service outages.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Multi-node clusters, RAID storage, redundant power supplies</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="25">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Network Isolation & Air-Gapped Deployment</h3>
+                                    <div class="item-description">Implement network segmentation and air-gapped deployment options for highly sensitive AI workloads requiring complete isolation from external networks.</div>
+                                    <div class="item-critical">Why Critical: Regulated industries and sensitive applications require complete network isolation to prevent data exfiltration and maintain compliance.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> VLANs, network firewalls, offline model deployment | Tools: Calico</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Governance Section -->
+                    <div class="section" data-section="data-governance">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Data Governance (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="26">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Data Residency Compliance</h3>
+                                    <div class="item-description">Ensure all training data, model artifacts, and inference results remain within specified geographic boundaries to meet regulatory requirements.</div>
+                                    <div class="item-critical">Why Critical: Data residency laws (GDPR, local regulations) can impose severe penalties for cross-border data movement in regulated industries.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Local storage policies, geographic access controls</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="27">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Local Data Pipeline Security</h3>
+                                    <div class="item-description">Implement end-to-end encryption and access controls for data pipelines processing sensitive information within on-premise infrastructure.</div>
+                                    <div class="item-critical">Why Critical: On-premise data pipelines handle the most sensitive organizational data. Security breaches can result in regulatory violations.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Encryption at rest/transit, RBAC | Tools: HashiCorp Vault</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Management Section -->
+                    <div class="section" data-section="platform-management">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Platform Management (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="28">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Container Orchestration (Kubernetes)</h3>
+                                    <div class="item-description">Deploy Kubernetes-native orchestration for scalable, portable AI workload management with automated scaling and resource allocation.</div>
+                                    <div class="item-critical">Why Critical: Manual container management becomes unmanageable at scale. Kubernetes provides the foundation for enterprise-grade AI operations.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Kubernetes clusters, Helm charts | Tools: Kubeflow, MLflow on K8s</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="29">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Model Registry & Artifact Management</h3>
+                                    <div class="item-description">Establish centralized model registry for versioning, metadata tracking, and artifact management across the entire ML lifecycle.</div>
+                                    <div class="item-critical">Why Critical: Without proper model management, teams lose track of model versions, leading to deployment errors and inability to reproduce results.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> MLflow Model Registry, DVC | Tools: MinIO, Harbor registry</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="30">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Resource Allocation & Scheduling</h3>
+                                    <div class="item-description">Implement intelligent resource scheduling to optimize compute allocation between training, inference, and development workloads based on priority and SLAs.</div>
+                                    <div class="item-critical">Why Critical: Poor resource scheduling leads to resource contention, delayed model training, and reduced system efficiency in resource-constrained environments.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Priority queues, resource quotas | Tools: Kubernetes resource quotas, Slurm</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Operations & Maintenance Section -->
+                    <div class="section" data-section="operations-maintenance">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>Operations & Maintenance (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="31">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Patch Management Strategy</h3>
+                                    <div class="item-description">Establish systematic patch management for OS, drivers, and AI framework updates with testing procedures and rollback capabilities.</div>
+                                    <div class="item-critical">Why Critical: Unpatched systems create security vulnerabilities. However, patches can break AI workloads, requiring careful testing and rollback procedures.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Staged rollouts, automated testing | Tools: Ansible, Puppet</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="onpremise" data-id="32">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Capacity Planning & Scaling</h3>
+                                    <div class="item-description">Implement capacity monitoring and planning processes to predict resource needs and plan hardware scaling based on workload growth patterns.</div>
+                                    <div class="item-critical">Why Critical: On-premise scaling requires lead time for hardware procurement. Poor planning results in either resource shortages or expensive overprovisioning.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Resource utilization monitoring, growth forecasting | Tools: Grafana dashboards</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FinOps On-Premise Section -->
+                    <div class="section" data-section="finops-onprem">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>FinOps - On-Premise (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="onpremise" data-id="33a">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Hardware Cost Tracking</h3>
+                                    <div class="item-description">Track total cost of ownership for on-premise AI infrastructure including hardware depreciation, power consumption, cooling, and operational costs to understand true AI deployment expenses.</div>
+                                    <div class="item-critical">Why Critical: Without tracking hardware depreciation, power, and ops costs, organizations cannot accurately compare on-premise vs cloud costs or justify infrastructure investments.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Asset management systems, power monitoring, cost allocation | Tools: DCIM software, power meters, financial tracking spreadsheets</div>
+                                    <span class="item-section onpremise">On-Premise</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <h2>Progress Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-number" id="onpremise-completed">0</div>
+                            <div>Completed</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="onpremise-remaining">11</div>
+                            <div>Remaining</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="onpremise-rate">0%</div>
+                            <div>Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cloud Tab -->
+            <div id="cloud-tab" class="tab-content">
+                <div class="deployment-info cloud">
+                    <strong>Cloud Deployment:</strong> Additional requirements for fast deployment with managed services and automatic scaling
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cloud-progress"></div>
+                </div>
+                <div class="progress-text" id="cloud-text">0 of 13 items completed (0%)</div>
+
+                <div class="controls">
+                    <button class="export-btn" onclick="exportProgress('cloud')">Export Progress</button>
+                    <button class="export-btn" onclick="resetProgress('cloud')">Reset All</button>
+                </div>
+
+                <div id="cloud-sections">
+                    <!-- AWS Architecture Section -->
+                    <div class="section" data-section="aws-architecture">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS Architecture (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="33">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Multi-Region Deployment Strategy</h3>
+                                    <div class="item-description">Deploy AI services across multiple AWS regions using Route 53 for DNS failover, S3 cross-region replication for model artifacts, and DynamoDB global tables for state management to ensure high availability and disaster recovery.</div>
+                                    <div class="item-critical">Why Critical: Single-region deployments create risk of complete service outage during regional failures. Multi-region architecture with proper failover ensures business continuity and meets RTO/RPO requirements.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Active-passive or active-active multi-region patterns, Route 53 health checks, cross-region replication | Tools: AWS Route 53, S3 Cross-Region Replication, DynamoDB Global Tables, CloudFormation StackSets</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="34">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Infrastructure as Code (IaC)</h3>
+                                    <div class="item-description">Define all AWS AI infrastructure using CloudFormation or Terraform with version-controlled templates, enabling repeatable deployments, drift detection, and consistent environments across dev/staging/prod.</div>
+                                    <div class="item-critical">Why Critical: Manual infrastructure provisioning leads to configuration drift, inconsistent environments, and inability to quickly recover or replicate infrastructure during incidents.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Template versioning, stack policies, drift detection, CI/CD integration for infrastructure | Tools: AWS CloudFormation, Terraform, AWS CDK, CloudFormation StackSets, AWS Service Catalog</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AWS Governance & Access Control Section -->
+                    <div class="section" data-section="aws-governance">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS Governance & Access Control (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="36">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Approved Services & Regions</h3>
+                                    <div class="item-description">Enforce approved AWS accounts, regions, and AI services (Bedrock, SageMaker) through Service Control Policies (SCPs) and resource policies with documented exception processes.</div>
+                                    <div class="item-critical">Why Critical: Ungoverned service sprawl leads to shadow AI deployments, compliance violations, data sovereignty breaches, and uncontrolled cost exposure across the organization.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> SCPs for region/service restrictions, resource policies, landing zone controls | Tools: AWS Organizations, AWS Control Tower, Service Control Policies, AWS Config Rules</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="37">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Resource Tagging Strategy</h3>
+                                    <div class="item-description">Enforce mandatory tagging taxonomy for AI workloads including cost center, data classification, environment, owner, and compliance scope with tag policy enforcement and drift detection.</div>
+                                    <div class="item-critical">Why Critical: Untagged resources create cost attribution blindspots, compliance gaps, orphaned workloads, and inability to enforce environment-specific security policies at scale.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Tag policies with enforcement, Config rules for compliance, automated remediation | Tools: AWS Organizations Tag Policies, AWS Config, Cost Allocation Tags, Resource Groups</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AWS Data Protection Section -->
+                    <div class="section" data-section="aws-data-protection">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS Data Protection (3 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="38">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Data Residency & Encryption at Rest</h3>
+                                    <div class="item-description">Enforce encryption at rest using customer-managed KMS keys (CMK) with appropriate key policies, automatic rotation, and region-locked key usage to meet data residency requirements.</div>
+                                    <div class="item-critical">Why Critical: Default encryption uses AWS-managed keys with limited auditability. Regulatory frameworks (GDPR, HIPAA, financial regulations) require demonstrable encryption controls and data locality guarantees.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> CMK with key policies, S3 bucket keys, EBS default encryption, SageMaker volume encryption | Tools: AWS KMS, S3 Server-Side Encryption (SSE-KMS), EBS Encryption, AWS Config rules for encryption compliance</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="39">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Provider Training Data Opt-Out</h3>
+                                    <div class="item-description">Configure and document opt-out settings to ensure inference data, prompts, and completions are not used for AWS or third-party model provider training, with contractual verification where required.</div>
+                                    <div class="item-critical">Why Critical: Without explicit opt-out, proprietary prompts, business logic, and sensitive data patterns may be incorporated into provider model training, creating IP leakage and competitive risks.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Bedrock model invocation logging settings, provider-specific data usage agreements, contractual DPAs | Tools: Amazon Bedrock data privacy settings, AWS PrivateLink for Bedrock, Model invocation logging controls</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="40">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>VPC Architecture & Private Connectivity</h3>
+                                    <div class="item-description">Deploy AI workloads in isolated VPCs with private subnets (no IGW for sensitive workloads), implement interface VPC endpoints for Bedrock, SageMaker, and S3 with restrictive endpoint policies, and enforce security group least-privilege with NACLs for defense-in-depth.</div>
+                                    <div class="item-critical">Why Critical: Public subnet deployment and public API endpoints expose AI services to internet-based attacks. Private connectivity via VPC endpoints keeps traffic within AWS backbone, while endpoint policies provide authorization beyond IAM, meeting zero-trust and compliance requirements.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Private subnets, interface endpoints with endpoint policies, DNS private hosted zones, security groups on endpoints, VPC Flow Logs | Tools: Amazon VPC, AWS PrivateLink, VPC Endpoints (Interface & Gateway), Route 53 Resolver, NACLs</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AWS Network & Perimeter Security Section -->
+                    <div class="section" data-section="aws-network-security">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS Network & Perimeter Security (1 item)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="41">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>WAF & DDoS Protection</h3>
+                                    <div class="item-description">Deploy AWS WAF with managed rule groups and custom rules for AI-specific threats (prompt injection patterns, abuse detection) on API Gateway or ALB endpoints, with Shield Advanced for DDoS protection.</div>
+                                    <div class="item-critical">Why Critical: AI endpoints are high-value targets for abuse, credential stuffing, and DDoS. WAF rules can detect and block malicious prompt patterns before they reach inference endpoints.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> WAF WebACLs with AI-specific rules, rate-based rules, Bot Control, Shield Advanced | Tools: AWS WAF, AWS Shield Advanced, AWS Firewall Manager, CloudFront</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AWS AI Operations Section -->
+                    <div class="section" data-section="aws-ai-operations">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS AI Operations (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="43">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Inference Endpoint Scaling & Throttling</h3>
+                                    <div class="item-description">Configure SageMaker endpoint auto-scaling policies, Bedrock provisioned throughput, and API Gateway throttling with appropriate scaling metrics, cooldown periods, and circuit breakers.</div>
+                                    <div class="item-critical">Why Critical: Misconfigured scaling leads to either cost explosion during traffic spikes or request failures during legitimate demand. Throttling prevents cascade failures and runaway costs.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Target tracking scaling, step scaling, provisioned concurrency, API Gateway usage plans | Tools: Application Auto Scaling, SageMaker Inference, Bedrock Provisioned Throughput, API Gateway Throttling</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="44">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Service Quotas & Limit Management</h3>
+                                    <div class="item-description">Document and monitor AWS service quotas for Bedrock (tokens per minute, model access), SageMaker (endpoint instances, training jobs), and related services with proactive limit increase requests.</div>
+                                    <div class="item-critical">Why Critical: Hitting service limits causes hard failures without warning. Production AI workloads require quota headroom and monitoring to prevent throttling during business-critical operations.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Service Quotas monitoring, CloudWatch alarms for quota utilization, automated limit increase requests | Tools: AWS Service Quotas, CloudWatch, Trusted Advisor, AWS Support API for limit increases</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AWS Security & Compliance Section -->
+                    <div class="section" data-section="aws-security-compliance">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <span>AWS Security & Compliance (2 items)</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="checklist-item" data-deployment="cloud" data-id="45">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Compliance Posture & Inheritance</h3>
+                                    <div class="item-description">Map organizational compliance requirements (SOC 2, ISO 27001, HIPAA, FedRAMP) to AWS shared responsibility model, document inherited controls from AWS Artifact, and implement customer-responsible controls.</div>
+                                    <div class="item-critical">Why Critical: Cloud compliance is shared responsibility. Organizations must demonstrate both AWS compliance inheritance and implementation of customer-side controls to satisfy auditors and regulators.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Control mapping documentation, AWS Artifact reports, Audit Manager assessments, compliance-specific Config conformance packs | Tools: AWS Artifact, AWS Audit Manager, AWS Config Conformance Packs, Security Hub compliance standards</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                            <div class="checklist-item" data-deployment="cloud" data-id="46">
+                                <div class="checkbox" onclick="toggleItem(this)"></div>
+                                <div class="item-content">
+                                    <h3>Security Monitoring & Incident Forensics</h3>
+                                    <div class="item-description">Enable Security Hub with AI-relevant findings aggregation, GuardDuty for threat detection, CloudTrail with log file integrity validation, and Detective for incident investigation with defined playbooks.</div>
+                                    <div class="item-critical">Why Critical: AI workloads are high-value targets requiring enhanced detection capabilities. Without centralized security monitoring and forensics tools, incident response is reactive and evidence collection is compromised.</div>
+                                    <div class="item-approaches"><strong>Implementation:</strong> Security Hub aggregation, GuardDuty threat detection, CloudTrail insights, Detective investigation graphs | Tools: AWS Security Hub, Amazon GuardDuty, AWS CloudTrail, Amazon Detective, CloudWatch Logs Insights</div>
+                                    <span class="item-section cloud">Cloud - AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <h2>Progress Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-number" id="cloud-completed">0</div>
+                            <div>Completed</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="cloud-remaining">13</div>
+                            <div>Remaining</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="cloud-rate">0%</div>
+                            <div>Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Management
+        let currentTab = 'generic';
+        let completedItems = {
+            generic: new Set(),
+            onpremise: new Set(),
+            cloud: new Set()
+        };
+
+        const deploymentConfig = {
+            generic: { totalItems: 27, name: 'Generic Development' },
+            onpremise: { totalItems: 13, name: 'On-Premise' },
+            cloud: { totalItems: 13, name: 'Cloud - AWS' }
+        };
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            currentTab = tabName;
+            loadProgress();
+            updateProgress();
+        }
+
+        function toggleItem(checkbox) {
+            const item = checkbox.closest('.checklist-item');
+            const itemId = item.dataset.id;
+            const deployment = item.dataset.deployment;
+
+            if (completedItems[deployment].has(itemId)) {
+                completedItems[deployment].delete(itemId);
+                checkbox.classList.remove('checked');
+                item.classList.remove('completed');
+            } else {
+                completedItems[deployment].add(itemId);
+                checkbox.classList.add('checked');
+                item.classList.add('completed');
+            }
+
+            updateProgress();
+            saveProgress();
+        }
+
+        function updateProgress() {
+            const completed = completedItems[currentTab].size;
+            const total = deploymentConfig[currentTab].totalItems;
+            const remaining = total - completed;
+            const percentage = Math.round((completed / total) * 100);
+
+            document.getElementById(currentTab + '-progress').style.width = percentage + '%';
+            document.getElementById(currentTab + '-text').textContent = `${completed} of ${total} items completed (${percentage}%)`;
+            document.getElementById(currentTab + '-completed').textContent = completed;
+            document.getElementById(currentTab + '-remaining').textContent = remaining;
+            document.getElementById(currentTab + '-rate').textContent = percentage + '%';
+        }
+
+        function toggleSection(header) {
+            const section = header.closest('.section');
+            section.classList.toggle('collapsed');
+        }
+
+        function saveProgress() {
+            localStorage.setItem('aiChecklistThreeTabsProgress', JSON.stringify({
+                generic: [...completedItems.generic],
+                onpremise: [...completedItems.onpremise],
+                cloud: [...completedItems.cloud]
+            }));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('aiChecklistThreeTabsProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                completedItems.generic = new Set(data.generic || []);
+                completedItems.onpremise = new Set(data.onpremise || []);
+                completedItems.cloud = new Set(data.cloud || []);
+
+                // Apply visual state to current tab
+                completedItems[currentTab].forEach(itemId => {
+                    const item = document.querySelector(`[data-deployment="${currentTab}"][data-id="${itemId}"]`);
+                    if (item) {
+                        const checkbox = item.querySelector('.checkbox');
+                        checkbox.classList.add('checked');
+                        item.classList.add('completed');
+                    }
+                });
+            }
+        }
+
+        function exportProgress(deployment) {
+            const data = {
+                timestamp: new Date().toISOString(),
+                deploymentType: deployment,
+                completed: completedItems[deployment].size,
+                total: deploymentConfig[deployment].totalItems,
+                percentage: Math.round((completedItems[deployment].size / deploymentConfig[deployment].totalItems) * 100),
+                completedItems: [...completedItems[deployment]]
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-checklist-${deployment}-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetProgress(deployment) {
+            if (confirm(`Are you sure you want to reset all ${deployment} progress? This cannot be undone.`)) {
+                completedItems[deployment].clear();
+                document.querySelectorAll(`[data-deployment="${deployment}"] .checkbox`).forEach(cb => cb.classList.remove('checked'));
+                document.querySelectorAll(`[data-deployment="${deployment}"] .checklist-item`).forEach(item => item.classList.remove('completed'));
+                updateProgress();
+                saveProgress();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

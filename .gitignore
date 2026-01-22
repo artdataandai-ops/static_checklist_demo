@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except these files
+!ai-checklist-three-tabs.html
+!root/
+!root/index.html
+!.gitignore
